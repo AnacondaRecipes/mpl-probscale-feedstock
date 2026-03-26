@@ -36,11 +36,12 @@ test:
     - probscale
   commands:
     - pip check
-    # - pytest -v --pyargs probscale
-    - pytest -v probscale/tests/
+    - pytest -v probscale/tests/  # [not win]
+    # Headless run on Windows ('test_axes_object_with_axes' fails without Agg backend)
+    - set MPLBACKEND=Agg&& pytest -v probscale/tests/  # [win]
 
 about:
-  home: http://matplotlib.org/mpl-probscale
+  home: https://matplotlib.org/mpl-probscale
   summary: Real probability scales for matplotlib
   description: |
     Real probability scales for matplotlib
