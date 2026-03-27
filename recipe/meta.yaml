@@ -1,41 +1,55 @@
+{% set name = "mpl-probscale" %}
 {% set version = "0.2.5" %}
 
 package:
-  name: mpl-probscale
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  url: https://github.com/matplotlib/mpl-probscale/archive/v{{ version }}.tar.gz
+  url: https://github.com/matplotlib/{{ name }}/archive/v{{ version }}.tar.gz
   sha256: 34774f6560ba178adbc1ef10635e6e825bac46120fb2285622298e061f8c8016
 
 build:
-  number: 1
-  noarch: python
+  number: 0
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: True  # [py<38]
 
 requirements:
   host:
-    - python {{ python_min }}
-    - setuptools
+    - python
     - pip
+    - setuptools
   run:
-    - python >={{ python_min }}
+    - python
     - numpy
     - matplotlib-base
-    # not really needed but the basic import imports the tests and needs this
-    - pytest
 
 test:
   requires:
-    - python {{ python_min }}
+    - pip
+    # Upstream 0.2.5 tests use nose-style setup() and pytest.warns(None); pin <8
+    # until mpl-probscale updates tests for pytest 8+.
+    - pytest >=7,<8
+  source_files:
+    - probscale/tests/
   imports:
     - probscale
+  commands:
+    - pip check
+    - pytest -v probscale/tests/  # [not win]
+    # Headless run on Windows ('test_axes_object_with_axes' fails without Agg backend)
+    - set MPLBACKEND=Agg&& pytest -v probscale/tests/  # [win]
 
 about:
-  home: http://matplotlib.org/mpl-probscale/
+  home: https://matplotlib.org/mpl-probscale
+  summary: Real probability scales for matplotlib
+  description: |
+    Real probability scales for matplotlib
   license: BSD-3-Clause
+  license_family: BSD
   license_file: LICENSE
-  summary: Probability scales for matplotlib
+  dev_url: https://github.com/matplotlib/mpl-probscale
+  doc_url: https://matplotlib.org/mpl-probscale
 
 extra:
   recipe-maintainers:
